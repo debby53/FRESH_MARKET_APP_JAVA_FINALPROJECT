@@ -10,7 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class LoginPhase {
+public class LoginPhase  extends JFrame{
     private static String dbUrl = "jdbc:oracle:thin:@localhost:1522/FRESH_FRUITS_APP";
     private static String dbUsername = "deborah";
     private static String dbPassword = "12345";
