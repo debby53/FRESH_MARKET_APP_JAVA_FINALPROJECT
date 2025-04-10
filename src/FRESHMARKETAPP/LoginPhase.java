@@ -123,7 +123,7 @@ public class LoginPhase extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
+     //in case a user forgot password
     private void forgotPassword() {
         String username = JOptionPane.showInputDialog(null, "Enter your username:");
         if (username == null || username.isEmpty()) return;
