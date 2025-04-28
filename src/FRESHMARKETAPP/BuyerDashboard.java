@@ -74,9 +74,103 @@ public class BuyerDashboard {
 
         btnSearch.addActionListener(e -> loadProducts(model, (String) categoryFilter.getSelectedItem(), searchField.getText()));
 
-        btnAddToCart.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Product added to cart (simulation)."));
+//        btnAddToCart.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Product added to cart (simulation)."));
+//        btnAddToCart.addActionListener(e -> {
+//            int selectedRow = table.getSelectedRow();
+//            if (selectedRow != -1) {
+//                int productId = (int) table.getValueAt(selectedRow, 0);
+//                String productName = (String) table.getValueAt(selectedRow, 1);
+//                int farmerId = (int) table.getValueAt(selectedRow, 5);
+//                String quantityStr = JOptionPane.showInputDialog(frame, "Enter quantity to add to cart:");
+//
+//                if (quantityStr != null && !quantityStr.trim().isEmpty()) {
+//                    try {
+//                        int quantity = Integer.parseInt(quantityStr);
+//                        Cart.addItem(new CartItem(productId, productName, quantity, farmerId));
+//                        JOptionPane.showMessageDialog(frame, "Added to cart successfully!");
+//                    } catch (NumberFormatException ex) {
+//                        JOptionPane.showMessageDialog(frame, "Invalid quantity entered.");
+//                    }
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(frame, "Please select a product first.");
+//            }
+//        });
+        btnAddToCart.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int productId = (int) table.getValueAt(selectedRow, 0);
+                String quantityStr = JOptionPane.showInputDialog(frame, "Enter quantity to add to cart:");
+                String buyerName = JOptionPane.showInputDialog(frame, "Enter your name:");
 
-        btnOrder.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Order placed (simulation)."));
+                if (quantityStr != null && buyerName != null) {
+                    try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+                        String insert = "INSERT INTO CART (product_id, quantity, buyer_name) VALUES (?, ?, ?)";
+                        PreparedStatement stmt = conn.prepareStatement(insert);
+                        stmt.setInt(1, productId);
+                        stmt.setInt(2, Integer.parseInt(quantityStr));
+                        stmt.setString(3, buyerName);
+                        stmt.executeUpdate();
+                        JOptionPane.showMessageDialog(frame, "Product added to cart!");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a product first.");
+            }
+        });
+
+
+//        btnOrder.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Order placed (simulation)."));
+//        btnOrder.addActionListener(e -> {
+//            if (Cart.getItems().isEmpty()) {
+//                JOptionPane.showMessageDialog(frame, "Your cart is empty. Please add items first.");
+//            } else {
+//                new OrderForm(frame); // Open the order form
+//            }
+//        });
+
+        btnOrder.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int productId = (int) table.getValueAt(selectedRow, 0);
+
+                JTextField buyerNameField = new JTextField();
+                JTextField contactField = new JTextField();
+                JTextField addressField = new JTextField();
+                JTextField quantityField = new JTextField();
+
+                JPanel panel = new JPanel(new GridLayout(0, 1));
+                panel.add(new JLabel("Your Name:"));
+                panel.add(buyerNameField);
+                panel.add(new JLabel("Contact Number:"));
+                panel.add(contactField);
+                panel.add(new JLabel("Delivery Address:"));
+                panel.add(addressField);
+                panel.add(new JLabel("Quantity:"));
+                panel.add(quantityField);
+
+                int result = JOptionPane.showConfirmDialog(frame, panel, "Place Your Order", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+                        String insert = "INSERT INTO ORDERED (product_id, quantity, buyer_name, delivery_address, contact_number) VALUES (?, ?, ?, ?, ?)";
+                        PreparedStatement stmt = conn.prepareStatement(insert);
+                        stmt.setInt(1, productId);
+                        stmt.setInt(2, Integer.parseInt(quantityField.getText()));
+                        stmt.setString(3, buyerNameField.getText());
+                        stmt.setString(4, addressField.getText());
+                        stmt.setString(5, contactField.getText());
+                        stmt.executeUpdate();
+                        JOptionPane.showMessageDialog(frame, "Order placed successfully!");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(frame, "Error placing order: " + ex.getMessage());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a product to order.");
+            }
+        });
 
         btnChat.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Chat window simulation - direct messaging feature coming soon!"));
 

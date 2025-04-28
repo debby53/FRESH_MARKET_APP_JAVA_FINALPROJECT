@@ -1,22 +1,15 @@
 package FRESHMARKETAPP;
 
-import FRESHMARKETAPP.BuyerDashboard;
-import FRESHMARKETAPP.FarmerDashboard;
-import FRESHMARKETAPP.RegisterFrame;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class LoginPhase extends JFrame {
-    private static String dbUrl = "jdbc:oracle:thin:@localhost:1522/FRESH_FRUITS_APP";
-    private static String dbUsername = "deborah";
-    private static String dbPassword = "12345";
+    private static final String dbUrl = "jdbc:oracle:thin:@localhost:1522/FRESH_FRUITS_APP";
+    private static final String dbUsername = "deborah";
+    private static final String dbPassword = "12345";
 
     public LoginPhase() {
         setTitle("Fresh Market Login");
@@ -83,12 +76,19 @@ public class LoginPhase extends JFrame {
 
         btnLogin.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username = txtName.getText();
-                String password = new String(txtPassword.getPassword());
-                String role = roleComboBox.getSelectedItem().toString();
+                String username = txtName.getText().trim();
+                String password = new String(txtPassword.getPassword()).trim();
+                String role = (String) roleComboBox.getSelectedItem();
 
+                // Validation: empty fields
                 if (username.isEmpty() || password.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please enter both username and password!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Please enter both username and password!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Additional validation: check input length
+                if (username.length() > 50 || password.length() > 50) {
+                    JOptionPane.showMessageDialog(null, "Username or password is too long!", "Input Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -99,23 +99,25 @@ public class LoginPhase extends JFrame {
                     stmt.setString(2, password);
                     stmt.setString(3, role);
 
-                    ResultSet rs = stmt.executeQuery();
-
-                    if (rs.next()) {
-                        JOptionPane.showMessageDialog(null, "Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        if (role.equals("Farmer")) {
-                            FarmerDashboard.main(null);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            JOptionPane.showMessageDialog(null, "Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            dispose();
+                            if ("Farmer".equals(role)) {
+                                FarmerDashboard.main(null);
+                            } else {
+                                BuyerDashboard.main(null);
+                            }
                         } else {
-                            BuyerDashboard.main(null);
+                            JOptionPane.showMessageDialog(null, "Invalid username, password, or role!", "Login Failed", JOptionPane.ERROR_MESSAGE);
                         }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Invalid credentials!", "Login Failed", JOptionPane.ERROR_MESSAGE);
                     }
-
+                } catch (SQLException sqlEx) {
+                    sqlEx.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Database Error: " + sqlEx.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Unexpected Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -123,27 +125,35 @@ public class LoginPhase extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-     //in case a user forgot password
+
+    // In case a user forgot password
     private void forgotPassword() {
-        String username = JOptionPane.showInputDialog(null, "Enter your username:");
-        if (username == null || username.isEmpty()) return;
-
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-             PreparedStatement stmt = conn.prepareStatement("SELECT password FROM USERS WHERE username=?")) {
-
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String password = rs.getString("password");
-                JOptionPane.showMessageDialog(null, "Your password is: " + password, "Password Recovery", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Username not found!", "Error", JOptionPane.ERROR_MESSAGE);
+        try {
+            String username = JOptionPane.showInputDialog(null, "Enter your username:");
+            if (username == null || username.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Username cannot be empty!", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return;
             }
 
+            try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+                 PreparedStatement stmt = conn.prepareStatement("SELECT password FROM USERS WHERE username=?")) {
+
+                stmt.setString(1, username.trim());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String password = rs.getString("password");
+                        JOptionPane.showMessageDialog(null, "Your password is: " + password, "Password Recovery", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Username not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (SQLException sqlEx) {
+                sqlEx.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Database Error: " + sqlEx.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database Error!", "Error" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Unexpected Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

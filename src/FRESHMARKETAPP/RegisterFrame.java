@@ -162,72 +162,208 @@ public class RegisterFrame extends JFrame {
             }
         });
     }
+    private static void registerUser(JFrame frame, String username, String password, String confirmPassword,
+                                     String email, String telNumber, String location, String dob, String firstName,
+                                     String middleName, String lastName, String gender, String nationality,
+                                     String idOrPassport, String selectedRole) {
+        try {
+            // Validation patterns
+            String usernamePattern = "^[a-zA-Z0-9_]{4,}$";
+            String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            String telPattern = "^07\\d{8}$";
+            String namePattern = "^[A-Za-z]+$";
+            String optionalNamePattern = "^[A-Za-z]*$";
+            String nationalityPattern = "^[A-Za-z ]+$";
 
-    private static void registerUser(JFrame frame, String username, String password, String confirmPassword, String email, String telNumber, String location, String dob, String firstName, String middleName, String lastName, String gender, String nationality, String idOrPassport, String selectedRole) {
-        String dobString = JOptionPane.showInputDialog(null, "Enter date of birth (YYYY-MM-DD):");
-        if (dobString == null || dobString.isEmpty()) return;
-
-        // Convert the string to java.sql.Date
-
-
-
-
-        // Validations
-
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty() || telNumber.isEmpty() || location.isEmpty() || dob.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || nationality.isEmpty() || idOrPassport.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            JOptionPane.showMessageDialog(frame, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Database interaction to check for existing users and insert new user
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement checkUser = conn.prepareStatement("SELECT * FROM USERS WHERE username = ?");
-             PreparedStatement insertUser = conn.prepareStatement("INSERT INTO USERS(id, username, password, email, tel_number, location, dob, first_name, middle_name, last_name, gender, nationality, id_or_passport, role) VALUES(users_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-
-
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date parsedDate = dateFormat.parse(dobString);
-//            dob = String.valueOf(new Date(parsedDate.getTime()));
-            java.sql.Date sqlDob = new java.sql.Date(parsedDate.getTime());
-
-
-
-
-            checkUser.setString(1, username);
-            ResultSet rs = checkUser.executeQuery();
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(frame, "Username already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (username.isEmpty() || !username.matches(usernamePattern)) {
+                JOptionPane.showMessageDialog(frame, "Invalid username. Must be at least 4 characters.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            insertUser.setString(1, username);
-            insertUser.setString(2, password);
-            insertUser.setString(3, email);
-            insertUser.setString(4, telNumber);
-            insertUser.setString(5, location);
-            insertUser.setDate(6, sqlDob);
-            insertUser.setString(7, firstName);
-            insertUser.setString(8, middleName);
-            insertUser.setString(9, lastName);
-            insertUser.setString(10, gender);
-            insertUser.setString(11, nationality);
-            insertUser.setString(12, idOrPassport);
-            insertUser.setString(13, selectedRole);
-            insertUser.executeUpdate();
+            if (password.isEmpty() || password.length() < 6) {
+                JOptionPane.showMessageDialog(frame, "Password must be at least 6 characters long.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            JOptionPane.showMessageDialog(frame, "Registration successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            if (!password.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(frame, "Passwords do not match! Try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Database error!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (email.isEmpty() || !email.matches(emailPattern)) {
+                JOptionPane.showMessageDialog(frame, "Invalid email format. Try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (telNumber.isEmpty() || !telNumber.matches(telPattern)) {
+                JOptionPane.showMessageDialog(frame, "Telephone must start with 07 and be exactly 10 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (location.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Location cannot be empty. Try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (dob.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Date of Birth is required. Try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validate DOB format
+            java.sql.Date sqlDob;
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateFormat.setLenient(false); // Strict parsing
+                java.util.Date parsedDate = dateFormat.parse(dob);
+                sqlDob = new java.sql.Date(parsedDate.getTime());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(frame, "Invalid Date of Birth format. Use YYYY-MM-DD.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (firstName.isEmpty() || !firstName.matches(namePattern)) {
+                JOptionPane.showMessageDialog(frame, "First Name must only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!middleName.matches(optionalNamePattern)) {
+                JOptionPane.showMessageDialog(frame, "Middle Name must only contain letters (or leave it empty).", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (lastName.isEmpty() || !lastName.matches(namePattern)) {
+                JOptionPane.showMessageDialog(frame, "Last Name must only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (gender == null || gender.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please select a gender.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (nationality.isEmpty() || !nationality.matches(nationalityPattern)) {
+                JOptionPane.showMessageDialog(frame, "Nationality must only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (idOrPassport.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "National ID/Passport cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (selectedRole == null || selectedRole.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please select a role.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Database interaction
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+                 PreparedStatement checkUser = conn.prepareStatement("SELECT * FROM USERS WHERE username = ?");
+                 PreparedStatement insertUser = conn.prepareStatement("INSERT INTO USERS(id, username, password, email, tel_number, location, dob, first_name, middle_name, last_name, gender, nationality, id_or_passport, role) VALUES(users_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+
+                checkUser.setString(1, username);
+                ResultSet rs = checkUser.executeQuery();
+                if (rs.next()) {
+                    JOptionPane.showMessageDialog(frame, "Username already exists! Try another.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                insertUser.setString(1, username);
+                insertUser.setString(2, password);
+                insertUser.setString(3, email);
+                insertUser.setString(4, telNumber);
+                insertUser.setString(5, location);
+                insertUser.setDate(6, sqlDob);
+                insertUser.setString(7, firstName);
+                insertUser.setString(8, middleName);
+                insertUser.setString(9, lastName);
+                insertUser.setString(10, gender);
+                insertUser.setString(11, nationality);
+                insertUser.setString(12, idOrPassport);
+                insertUser.setString(13, selectedRole);
+
+                insertUser.executeUpdate();
+
+                JOptionPane.showMessageDialog(frame, "Registration successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Database error occurred. Try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Unexpected error! Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+//
+//    private static void registerUser(JFrame frame, String username, String password, String confirmPassword, String email, String telNumber, String location, String dob, String firstName, String middleName, String lastName, String gender, String nationality, String idOrPassport, String selectedRole) {
+//        String dobString = JOptionPane.showInputDialog(null, "Enter date of birth (YYYY-MM-DD):");
+//        if (dobString == null || dobString.isEmpty()) return;
+//
+//        // Convert the string to java.sql.Date
+//
+//
+//
+//
+//        // Validations
+//
+//        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty() || telNumber.isEmpty() || location.isEmpty() || dob.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || nationality.isEmpty() || idOrPassport.isEmpty()) {
+//            JOptionPane.showMessageDialog(frame, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+//            return;
+//        }
+//
+//        if (!password.equals(confirmPassword)) {
+//            JOptionPane.showMessageDialog(frame, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
+//            return;
+//        }
+//
+//        // Database interaction to check for existing users and insert new user
+//        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+//             PreparedStatement checkUser = conn.prepareStatement("SELECT * FROM USERS WHERE username = ?");
+//             PreparedStatement insertUser = conn.prepareStatement("INSERT INTO USERS(id, username, password, email, tel_number, location, dob, first_name, middle_name, last_name, gender, nationality, id_or_passport, role) VALUES(users_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+//
+//
+//
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            java.util.Date parsedDate = dateFormat.parse(dobString);
+////            dob = String.valueOf(new Date(parsedDate.getTime()));
+//            java.sql.Date sqlDob = new java.sql.Date(parsedDate.getTime());
+//
+//
+//
+//
+//            checkUser.setString(1, username);
+//            ResultSet rs = checkUser.executeQuery();
+//            if (rs.next()) {
+//                JOptionPane.showMessageDialog(frame, "Username already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+//                return;
+//            }
+//
+//            insertUser.setString(1, username);
+//            insertUser.setString(2, password);
+//            insertUser.setString(3, email);
+//            insertUser.setString(4, telNumber);
+//            insertUser.setString(5, location);
+//            insertUser.setDate(6, sqlDob);
+//            insertUser.setString(7, firstName);
+//            insertUser.setString(8, middleName);
+//            insertUser.setString(9, lastName);
+//            insertUser.setString(10, gender);
+//            insertUser.setString(11, nationality);
+//            insertUser.setString(12, idOrPassport);
+//            insertUser.setString(13, selectedRole);
+//            insertUser.executeUpdate();
+//
+//            JOptionPane.showMessageDialog(frame, "Registration successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frame, "Database error!", "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
 
     public static void main(String[] args) {
         // Create an instance of RegisterFrame and show it

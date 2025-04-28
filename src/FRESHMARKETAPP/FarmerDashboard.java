@@ -71,6 +71,15 @@ public class FarmerDashboard {
         btnSearch.setVisible(false);
         frame.add(btnSearch);
 
+        JButton btnViewOrders = new JButton("View Orders");
+        btnViewOrders.setBounds(350, 190, 150, 50);
+        frame.add(btnViewOrders);
+
+        JButton btnViewCart = new JButton("View Cart");
+        btnViewCart.setBounds(400, 250, 130, 50);
+        frame.add(btnViewCart);
+
+
         // Product Table
         String[] columnNames = {"Product ID", "Name", "Category", "Price", "Quantity"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
@@ -121,6 +130,23 @@ public class FarmerDashboard {
                 }
             }
         });
+// View Orders Button Logic
+        btnViewOrders.addActionListener(e -> {
+            searchField.setVisible(false);
+            btnSearch.setVisible(false);
+            scrollPane.setVisible(true);
+            model.setRowCount(0);
+            loadOrders(model);
+        });
+
+// View Cart Button Logic
+        btnViewCart.addActionListener(e -> {
+            searchField.setVisible(false);
+            btnSearch.setVisible(false);
+            scrollPane.setVisible(true);
+            model.setRowCount(0);
+            loadCart(model);
+        });
 
         // Placeholder actions
         btnInventory.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Inventory management coming soon!"));
@@ -135,6 +161,58 @@ public class FarmerDashboard {
 
         frame.setVisible(true);
     }
+    // Load Orders placed from DB
+    private static void loadOrders(DefaultTableModel model) {
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT order_id, customer_name, product_id, quantity, total_price, order_date FROM ORDERED")) {
+
+            // Update columns for Orders
+            model.setColumnIdentifiers(new String[]{"Order ID", "Customer Name", "Product ID", "Quantity", "Total Price", "Order Date"});
+            model.setRowCount(0); // Clear table
+
+            while (rs.next()) {
+                Object[] row = {
+                        rs.getInt("order_id"),
+                        rs.getString("customer_name"),
+                        rs.getInt("product_id"),
+                        rs.getInt("quantity"),
+                        rs.getDouble("total_price"),
+                        rs.getDate("order_date")
+                };
+                model.addRow(row);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error loading orders:\n" + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Load Cart items from DB
+    private static void loadCart(DefaultTableModel model) {
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT cart_id, customer_name, product_id, quantity FROM CART")) {
+
+            // Update columns for Cart
+            model.setColumnIdentifiers(new String[]{"Cart ID", "Customer Name", "Product ID", "Quantity"});
+            model.setRowCount(0); // Clear table
+
+            while (rs.next()) {
+                Object[] row = {
+                        rs.getInt("cart_id"),
+                        rs.getString("customer_name"),
+                        rs.getInt("product_id"),
+                        rs.getInt("quantity")
+                };
+                model.addRow(row);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error loading cart:\n" + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     // Load products from DB
     private static void loadProducts(DefaultTableModel model) {
