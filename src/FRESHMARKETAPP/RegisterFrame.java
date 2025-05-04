@@ -24,7 +24,7 @@ public class RegisterFrame extends JFrame {
     private JTextField txtNationality, txtIdOrPassport;
     private JPasswordField txtPassword, txtConfirmPassword;
     private JComboBox<String> genderComboBox, roleComboBox;
-    private JButton btnRegister, btnReset;
+    private JButton btnRegister, btnReset, btnBackToLogin;
 
     // Colors
     private final Color PRIMARY_COLOR = new Color(46, 139, 87); // Forest Green
@@ -97,7 +97,8 @@ public class RegisterFrame extends JFrame {
     }
 
     private JPanel createAccountPanel() {
-        JPanel accountPanel = new JPanel(new GridBagLayout());
+        JPanel accountPanel = new JPanel();
+        accountPanel.setLayout(new GridBagLayout());
         accountPanel.setBackground(Color.WHITE);
         accountPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
@@ -111,60 +112,134 @@ public class RegisterFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
 
-        // Username
-        addFormField(accountPanel, "Username:", gbc, 0);
-        txtUsername = new JTextField();
+        // Username - Make sure it's properly visible
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.3;
+        JLabel lblUsername = new JLabel("Username:");
+        lblUsername.setFont(LABEL_FONT);
+        lblUsername.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblUsername, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.7;
+        txtUsername = new JTextField(15);
         styleTextField(txtUsername);
-        addComponent(accountPanel, txtUsername, gbc, 1);
+        accountPanel.add(txtUsername, gbc);
 
         // Password
-        addFormField(accountPanel, "Password:", gbc, 2);
-        txtPassword = new JPasswordField();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0.3;
+        JLabel lblPassword = new JLabel("Password:");
+        lblPassword.setFont(LABEL_FONT);
+        lblPassword.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblPassword, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 0.7;
+        txtPassword = new JPasswordField(15);
         styleTextField(txtPassword);
-        addComponent(accountPanel, txtPassword, gbc, 3);
+        accountPanel.add(txtPassword, gbc);
 
         // Confirm Password
-        addFormField(accountPanel, "Confirm Password:", gbc, 4);
-        txtConfirmPassword = new JPasswordField();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0.3;
+        JLabel lblConfirmPassword = new JLabel("Confirm Password:");
+        lblConfirmPassword.setFont(LABEL_FONT);
+        lblConfirmPassword.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblConfirmPassword, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.weightx = 0.7;
+        txtConfirmPassword = new JPasswordField(15);
         styleTextField(txtConfirmPassword);
-        addComponent(accountPanel, txtConfirmPassword, gbc, 5);
+        accountPanel.add(txtConfirmPassword, gbc);
 
         // Email
-        addFormField(accountPanel, "Email:", gbc, 6);
-        txtEmail = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 0.3;
+        JLabel lblEmail = new JLabel("Email:");
+        lblEmail.setFont(LABEL_FONT);
+        lblEmail.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblEmail, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.weightx = 0.7;
+        txtEmail = new JTextField(15);
         styleTextField(txtEmail);
-        addComponent(accountPanel, txtEmail, gbc, 7);
+        accountPanel.add(txtEmail, gbc);
 
         // Phone
-        addFormField(accountPanel, "Telephone:", gbc, 8);
-        txtTelNumber = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 0.3;
+        JLabel lblTelNumber = new JLabel("Telephone:");
+        lblTelNumber.setFont(LABEL_FONT);
+        lblTelNumber.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblTelNumber, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.weightx = 0.7;
+        txtTelNumber = new JTextField(15);
         styleTextField(txtTelNumber);
-        addComponent(accountPanel, txtTelNumber, gbc, 9);
+        accountPanel.add(txtTelNumber, gbc);
 
         // Location
-        addFormField(accountPanel, "Location:", gbc, 10);
-        txtLocation = new JTextField();
-        styleTextField(txtLocation);
-        addComponent(accountPanel, txtLocation, gbc, 11);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weightx = 0.3;
+        JLabel lblLocation = new JLabel("Location:");
+        lblLocation.setFont(LABEL_FONT);
+        lblLocation.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblLocation, gbc);
 
-        // Role
-        addFormField(accountPanel, "Role:", gbc, 12);
-        String[] roles = {"Buyer", "Farmer"};
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.weightx = 0.7;
+        txtLocation = new JTextField(15);
+        styleTextField(txtLocation);
+        accountPanel.add(txtLocation, gbc);
+
+        // Role - Change to Buyer/Farmer
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 0.3;
+        JLabel lblRole = new JLabel("Role:");
+        lblRole.setFont(LABEL_FONT);
+        lblRole.setForeground(PRIMARY_COLOR);
+        accountPanel.add(lblRole, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.weightx = 0.7;
+        String[] roles = {"select role","Buyer", "Farmer"};  // Changed from "Seller" to "Farmer"
         roleComboBox = new JComboBox<>(roles);
         styleComboBox(roleComboBox);
-        addComponent(accountPanel, roleComboBox, gbc, 13);
+        accountPanel.add(roleComboBox, gbc);
 
         // Add some vertical glue to push everything up
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         gbc.weighty = 1.0;
-        gbc.gridy = 14;
+        gbc.gridwidth = 2;
         accountPanel.add(Box.createVerticalGlue(), gbc);
 
         return accountPanel;
     }
 
     private JPanel createPersonalPanel() {
-        JPanel personalPanel = new JPanel(new GridBagLayout());
+        JPanel personalPanel = new JPanel();
+        personalPanel.setLayout(new GridBagLayout());
         personalPanel.setBackground(Color.WHITE);
         personalPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
@@ -178,53 +253,126 @@ public class RegisterFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
 
         // First Name
-        addFormField(personalPanel, "First Name:", gbc, 0);
-        txtFirstName = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.3;
+        JLabel lblFirstName = new JLabel("First Name:");
+        lblFirstName.setFont(LABEL_FONT);
+        lblFirstName.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblFirstName, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.7;
+        txtFirstName = new JTextField(15);
         styleTextField(txtFirstName);
-        addComponent(personalPanel, txtFirstName, gbc, 1);
+        personalPanel.add(txtFirstName, gbc);
 
         // Middle Name
-        addFormField(personalPanel, "Middle Name:", gbc, 2);
-        txtMiddleName = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0.3;
+        JLabel lblMiddleName = new JLabel("Middle Name:");
+        lblMiddleName.setFont(LABEL_FONT);
+        lblMiddleName.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblMiddleName, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 0.7;
+        txtMiddleName = new JTextField(15);
         styleTextField(txtMiddleName);
-        addComponent(personalPanel, txtMiddleName, gbc, 3);
+        personalPanel.add(txtMiddleName, gbc);
 
         // Last Name
-        addFormField(personalPanel, "Last Name:", gbc, 4);
-        txtLastName = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0.3;
+        JLabel lblLastName = new JLabel("Last Name:");
+        lblLastName.setFont(LABEL_FONT);
+        lblLastName.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblLastName, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.weightx = 0.7;
+        txtLastName = new JTextField(15);
         styleTextField(txtLastName);
-        addComponent(personalPanel, txtLastName, gbc, 5);
+        personalPanel.add(txtLastName, gbc);
 
         // Date of Birth
-        addFormField(personalPanel, "Date of Birth (YYYY-MM-DD):", gbc, 6);
-        txtDob = new JTextField();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 0.3;
+        JLabel lblDob = new JLabel("Date of Birth (YYYY-MM-DD):");
+        lblDob.setFont(LABEL_FONT);
+        lblDob.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblDob, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.weightx = 0.7;
+        txtDob = new JTextField(15);
         styleTextField(txtDob);
-        addComponent(personalPanel, txtDob, gbc, 7);
+        personalPanel.add(txtDob, gbc);
 
         // Gender
-        addFormField(personalPanel, "Gender:", gbc, 8);
-        String[] genders = {"Male", "Female", "Other"};
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 0.3;
+        JLabel lblGender = new JLabel("Gender:");
+        lblGender.setFont(LABEL_FONT);
+        lblGender.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblGender, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.weightx = 0.7;
+        String[] genders = {"select","Male", "Female", "Other"};
         genderComboBox = new JComboBox<>(genders);
         styleComboBox(genderComboBox);
-        addComponent(personalPanel, genderComboBox, gbc, 9);
+        personalPanel.add(genderComboBox, gbc);
 
         // Nationality
-        addFormField(personalPanel, "Nationality:", gbc, 10);
-        txtNationality = new JTextField();
-        styleTextField(txtNationality);
-        addComponent(personalPanel, txtNationality, gbc, 11);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weightx = 0.3;
+        JLabel lblNationality = new JLabel("Nationality:");
+        lblNationality.setFont(LABEL_FONT);
+        lblNationality.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblNationality, gbc);
 
-        // ID/Passport
-        addFormField(personalPanel, "National ID/Passport:", gbc, 12);
-        txtIdOrPassport = new JTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.weightx = 0.7;
+        txtNationality = new JTextField(15);
+        styleTextField(txtNationality);
+        personalPanel.add(txtNationality, gbc);
+
+        // ID/Passport - Make sure this is visible
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 0.3;
+        JLabel lblIdOrPassport = new JLabel("National ID/Passport:");
+        lblIdOrPassport.setFont(LABEL_FONT);
+        lblIdOrPassport.setForeground(PRIMARY_COLOR);
+        personalPanel.add(lblIdOrPassport, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.weightx = 0.7;
+        txtIdOrPassport = new JTextField(15);
         styleTextField(txtIdOrPassport);
-        addComponent(personalPanel, txtIdOrPassport, gbc, 13);
+        personalPanel.add(txtIdOrPassport, gbc);
 
         // Add some vertical glue to push everything up
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         gbc.weighty = 1.0;
-        gbc.gridy = 14;
+        gbc.gridwidth = 2;
         personalPanel.add(Box.createVerticalGlue(), gbc);
 
         return personalPanel;
@@ -252,29 +400,39 @@ public class RegisterFrame extends JFrame {
             }
         });
 
+        // Create Back to Login button
+        btnBackToLogin = new JButton("Back to Login");
+        styleButton(btnBackToLogin, new Color(70, 130, 180), Color.WHITE); // Steel Blue color
+        // Special sizing for the back button - make it wider
+        btnBackToLogin.setPreferredSize(new Dimension(180, 45));
+        btnBackToLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goToLoginPage();
+            }
+        });
+
         buttonsPanel.add(btnRegister);
         buttonsPanel.add(btnReset);
+        buttonsPanel.add(btnBackToLogin); // Add the new button
 
         return buttonsPanel;
     }
 
-    private void addFormField(JPanel panel, String labelText, GridBagConstraints gbc, int gridy) {
-        gbc.gridx = 0;
-        gbc.gridy = gridy;
-        gbc.weightx = 0.3;
+    // Method to navigate to login page
+    private void goToLoginPage() {
+        // Close current registration window
+        this.dispose();
 
-        JLabel label = new JLabel(labelText);
-        label.setFont(LABEL_FONT);
-        label.setForeground(PRIMARY_COLOR);
-        panel.add(label, gbc);
-    }
-
-    private void addComponent(JPanel panel, JComponent component, GridBagConstraints gbc, int gridy) {
-        gbc.gridx = 1;
-        gbc.gridy = gridy;
-        gbc.weightx = 0.7;
-
-        panel.add(component, gbc);
+        // Open login frame
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                // Assuming your login frame class is named LoginFrame
+                LoginPhase loginFrame = new LoginPhase();
+                loginFrame.setVisible(true);
+            }
+        });
     }
 
     private void styleTextField(JTextField textField) {
@@ -283,12 +441,15 @@ public class RegisterFrame extends JFrame {
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         textField.setFont(new Font("Arial", Font.PLAIN, 14));
+        textField.setOpaque(true);  // Make sure it's opaque
+        textField.setBackground(Color.WHITE);  // Set background color
     }
 
     private void styleComboBox(JComboBox<String> comboBox) {
         comboBox.setPreferredSize(new Dimension(150, 30));
         comboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         comboBox.setBackground(Color.WHITE);
+        comboBox.setOpaque(true);
     }
 
     private void styleButton(JButton button, Color bgColor, Color fgColor) {
@@ -425,7 +586,7 @@ public class RegisterFrame extends JFrame {
             return false;
         }
 
-        if (gender == null || gender.isEmpty()) {
+        if (gender == null || gender.isEmpty() || gender.equals("select")) {
             showError("Please select a gender.");
             return false;
         }
@@ -437,6 +598,11 @@ public class RegisterFrame extends JFrame {
 
         if (idOrPassport.isEmpty()) {
             showError("National ID/Passport cannot be empty.");
+            return false;
+        }
+
+        if (selectedRole == null || selectedRole.isEmpty() || selectedRole.equals("select role")) {
+            showError("Please select a role (Buyer or Farmer).");
             return false;
         }
 
@@ -493,8 +659,8 @@ public class RegisterFrame extends JFrame {
                         "Registration successful! You can now log in.",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                // Reset form after successful registration
-                resetForm();
+                // Redirect to login page after successful registration
+                goToLoginPage();
 
             } catch (Exception ex) {
                 ex.printStackTrace();

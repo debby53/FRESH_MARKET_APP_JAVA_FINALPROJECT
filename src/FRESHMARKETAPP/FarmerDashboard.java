@@ -19,6 +19,7 @@ public class FarmerDashboard {
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245); // Light Gray
     private static final Color TEXT_COLOR = new Color(33, 33, 33);          // Dark Gray
     private static final Color WHITE = new Color(255, 255, 255);            // White
+    private static final Color BLACK = new Color(0, 0, 0);                  // Black
 
     // Replace with your actual DB credentials
     static final String dbUrl = "jdbc:oracle:thin:@localhost:1522/FRESH_FRUITS_APP";
@@ -87,6 +88,7 @@ public class FarmerDashboard {
         JLabel tableTitle = new JLabel("My Products");
         tableTitle.setFont(SUBTITLE_FONT);
         tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        tableTitle.setForeground(BLACK); // Setting table title to black color
 
         // Search panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -297,11 +299,11 @@ public class FarmerDashboard {
         table.setSelectionBackground(new Color(232, 245, 233));
         table.setSelectionForeground(TEXT_COLOR);
 
-        // Style the header
+        // Style the header - Changed text color to BLACK
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setBackground(SECONDARY_COLOR);
-        header.setForeground(WHITE);
+        header.setForeground(BLACK); // Changed from WHITE to BLACK
         header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, PRIMARY_COLOR));
 
         // Add zebra striping
@@ -394,7 +396,6 @@ public class FarmerDashboard {
     }
 
     // Search products from DB
-    // Search products from DB - Fixed version
     private static void searchProducts(DefaultTableModel model, String keyword) {
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
             // Modified query: removed the CAST operation that was causing the error

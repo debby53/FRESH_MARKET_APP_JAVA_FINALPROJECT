@@ -25,6 +25,7 @@ public class LoginPhase extends JFrame {
     private final Color GRAY_700 = new Color(55, 65, 81);
     private final Color GRAY_300 = new Color(209, 213, 219);
     private final Color GRAY_800 = new Color(31, 41, 55);
+    private final Color BLACK = new Color(0, 0, 0); // Added black color
 
     // Components
     private JTextField txtUsername;
@@ -268,7 +269,7 @@ public class LoginPhase extends JFrame {
         lblRole.setFont(new Font("Arial", Font.PLAIN, 14));
         lblRole.setForeground(GRAY_700);
 
-        String[] roles = {"Farmer", "Buyer"};
+        String[] roles = {"select","Farmer", "Buyer"};
         roleComboBox = new JComboBox<>(roles);
         roleComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         roleComboBox.setBorder(new RoundedBorder(5, GRAY_300));
@@ -282,10 +283,10 @@ public class LoginPhase extends JFrame {
         rolePanel.add(lblRole, BorderLayout.NORTH);
         rolePanel.add(roleComboBorder, BorderLayout.CENTER);
 
-        // Login button
+        // Login button - CHANGED TEXT COLOR TO BLACK
         btnLogin = new JButton("Login");
         btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        btnLogin.setForeground(WHITE);
+        btnLogin.setForeground(BLACK); // Changed from WHITE to BLACK for better visibility
         btnLogin.setBackground(GREEN_600);
         btnLogin.setBorder(new RoundedBorder(5));
         btnLogin.setFocusPainted(false);
